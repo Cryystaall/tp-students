@@ -1,5 +1,16 @@
 from collections.abc import Iterable, Iterator
 
+def add_matter4(cls):
+    original_init = cls.__init__
+
+    def new_init(self, name, matter1, matter2, matter3):
+        original_init(self, name, matter1, matter2, matter3)
+        self.matter4 = 0
+
+    cls.__init__ = new_init
+    return cls
+
+@add_matter4
 class Student:
     def __init__(self, name, matter1, matter2, matter3):
         self.name = name
@@ -13,6 +24,30 @@ class Student:
 class Matter1Iterator(Iterator):
     def __init__(self, students):
         self.students = sorted(students, key=lambda s: s.matter1, reverse=True)
+        self.index = 0
+
+    def __next__(self):
+        if self.index >= len(self.students):
+            raise StopIteration
+        student = self.students[self.index]
+        self.index += 1
+        return student
+
+class Matter2Iterator(Iterator):
+    def __init__(self, students):
+        self.students = sorted(students, key=lambda s: s.matter2, reverse=True)
+        self.index = 0
+
+    def __next__(self):
+        if self.index >= len(self.students):
+            raise StopIteration
+        student = self.students[self.index]
+        self.index += 1
+        return student
+
+class Matter3Iterator(Iterator):
+    def __init__(self, students):
+        self.students = sorted(students, key=lambda s: s.matter3, reverse=True)
         self.index = 0
 
     def __next__(self):
@@ -50,29 +85,6 @@ class SchoolClass(Iterable):
     def __iter__(self):
         return Matter1Iterator(self.students)
 
-class Matter2Iterator(Iterator):
-    def __init__(self, students):
-        self.students = sorted(students, key=lambda s: s.matter2, reverse=True)
-        self.index = 0
-
-    def __next__(self):
-        if self.index >= len(self.students):
-            raise StopIteration
-        student = self.students[self.index]
-        self.index += 1
-        return student
-
-class Matter3Iterator(Iterator):
-    def __init__(self, students):
-        self.students = sorted(students, key=lambda s: s.matter3, reverse=True)
-        self.index = 0
-
-    def __next__(self):
-        if self.index >= len(self.students):
-            raise StopIteration
-        student = self.students[self.index]
-        self.index += 1
-        return student
 
 if __name__ == "__main__":
     school_class = SchoolClass()
@@ -100,3 +112,7 @@ if __name__ == "__main__":
     print("\nIterator matière 3")
     for s in Matter3Iterator(school_class.students):
         print(s.name, s.matter3)
+
+    print("\nMatière 4")
+    for s in school_class.students:
+        print(s.name, s.matter4)
