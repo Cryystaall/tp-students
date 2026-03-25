@@ -1,3 +1,5 @@
+from collections.abc import Iterable, Iterator
+
 class Student:
     def __init__(self, name, matter1, matter2, matter3):
         self.name = name
@@ -8,8 +10,19 @@ class Student:
     def average(self):
         return (self.matter1 + self.matter2 + self.matter3) / 3
 
+class Matter1Iterator(Iterator):
+    def __init__(self, students):
+        self.students = sorted(students, key=lambda s: s.matter1, reverse=True)
+        self.index = 0
 
-class SchoolClass:
+    def __next__(self):
+        if self.index >= len(self.students):
+            raise StopIteration
+        student = self.students[self.index]
+        self.index += 1
+        return student
+
+class SchoolClass(Iterable):
     def __init__(self):
         self.students = []
 
@@ -34,6 +47,10 @@ class SchoolClass:
         for s in sorted_students:
             print(s.name, s.matter3)
 
+    def __iter__(self):
+        return Matter1Iterator(self.students)
+
+
 if __name__ == "__main__":
     school_class = SchoolClass()
 
@@ -41,10 +58,14 @@ if __name__ == "__main__":
     school_class.add_student(Student('A', 8, 2, 17))
     school_class.add_student(Student('V', 9, 14, 14))
 
+    print("Étudiants ajoutés")
+    for s in school_class.students:
+        print(s.name, s.matter1, s.matter2, s.matter3)
+
     school_class.rank_matter_1()
     school_class.rank_matter_2()
     school_class.rank_matter_3()
-
-    print("Étudiants ajoutés :")
-    for s in school_class.students:
-        print(s.name, s.matter1, s.matter2, s.matter3)
+    
+    print("\nIterator matière 1")
+    for s in school_class:
+        print(s.name, s.matter1)
